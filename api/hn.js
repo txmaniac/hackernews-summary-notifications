@@ -77,12 +77,23 @@ async function extractSummary(url) {
  * @param {object} story An object with title, summary and url
  */
 async function sendNotification(story) {
+  /*
+   * To make it easy for users to open the article directly from the
+   * notification — especially on iOS where links in the message body
+   * aren’t clickable — we leverage ntfy’s “click action” feature.
+   * Passing the article URL in the `Click` header ensures that
+   * tapping the notification opens the link in the default browser.
+   * See the ntfy docs: Passing a URL as the value of the `X‑Click` or
+   * `Click` header causes the client to open that URL when the
+   * notification is clicked【636718046834246†L2470-L2483】.
+   */
   const body = `${story.summary}\n${story.url}`;
   const res = await fetch(`https://ntfy.sh/${TOPIC}`, {
     method: 'POST',
     headers: {
       Title: story.title,
-      Tags: TAGS
+      Tags: TAGS,
+      Click: story.url
     },
     body
   });
