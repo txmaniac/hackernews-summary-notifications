@@ -117,7 +117,12 @@ export default async function handler(req, res) {
       const item = await fetchJSON(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
       if (!item || !item.url) continue;
       const summary = await extractSummary(item.url);
-      await sendNotification({ title: item.title, summary: summary || '(No summary available)', url: item.url });
+      try {
+        await sendNotification({ title: item.title, summary: summary || '(No summary available)', url: item.url });
+      }
+      catch (err){
+        console.error(err);
+      }
       sent++;
     }
     res.status(200).json({ success: true, sent });
